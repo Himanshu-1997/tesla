@@ -19,7 +19,14 @@ isAdmin = function(req,res){
 module.exports = function(app,passport){
 
 	app.get('/dashboard',isLoggedIn,function(req,res){
-		res.render("dashboard")
+		var pageInfo = {};
+		batch.menuItems((found)=>{
+			pageInfo.title = "Dashboard"
+			pageInfo.menu = found.menu
+
+		})
+		pageInfo.group = isAdmin(req,res)
+		res.render("dashboard",pageInfo)
 	})
 
 	app.get('/auth',function(req,res){
