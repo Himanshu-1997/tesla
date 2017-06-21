@@ -13,8 +13,8 @@ var userSchema = new Schema({
 	branch     : {type:String,require:true},
 	password   : {type:String,require:true},
 	group	   : {type:Number,require:false,default:1},
-	isDisabled : {type:Boolean,require:false,default:false}
-})
+	isDisabled : {type:Boolean,require:false,default:false},
+},{timestamps:true})
 
 userSchema.methods.generateHash = function(password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
