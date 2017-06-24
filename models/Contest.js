@@ -6,7 +6,6 @@ var contestSchema = new Schema({
 	contestType  	: {type:String,require:true},
 	startTime		: {type:Date,require:true},
 	endTime			: {type:Date,require:true},
-	album			: {type: [mongoose.Schema.Types.ObjectId], ref: 'Question',default:[]},
 	isDisabled		: {type:Boolean,default:false}
 })
 

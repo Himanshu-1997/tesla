@@ -1,6 +1,28 @@
 const batch = require('./lib/lib.js');
 const contest = require('./controller/contest.js');
 const question = require('./controller/question.js');
+const score = require('./controller/score.js')
+var formidable = require('formidable');
+var fs = require('fs');
+var async = require('async')
+
+
+/*var multer = require('multer');
+var storage = multer.diskStorage({
+	destination: function(req,file,cb){
+		cb(null,__dirname+'/public/images/tesla/')
+	},
+	filename: function(req,file,cb){
+		console.log(req.body)
+		console.log("---------------------")
+		console.log(file.originalname)
+		cb(null,file.originalname);
+	}
+});
+
+var upload = multer({ storage:storage });*/
+
+var a = 5
 
 function isLoggedIn(req,res,next){
 	if(req.isAuthenticated())
@@ -45,8 +67,65 @@ module.exports = function(app,passport){
 			})
 	})
 
-	app.get('/contest',function(req,res){
 
+
+	app.get('/contest',function(req,res){
+		var pageInfo = {}
+		batch.menuItems((found)=>{
+			pageInfo.menu = found.menu
+		})
+		items = [contest]
+
+		async.each(items,function(item,callback){
+			item.getContest(req,res,(founds)=>{
+				pageInfo.data = founds.data
+				callback();
+			})
+		},
+		function(){
+			status = ""
+			res.render("contest/contest",pageInfo)
+		}
+		)
+		//pageInfo.datas = "helloworld"
+		
+		
+	})
+
+	app.get("/viewSolution",function(req,res){
+		question.getQuestion(req,res,(found)=>{
+			let pageInfo = {}
+			//console.log(found)
+			pageInfo.data = found.data
+			console.log(pageInfo)
+			res.render("viewSolution",pageInfo)
+		})
+	})
+
+	app.get("/questionPanel",function(req,res){
+		console.log("1")
+		score.checkSubmission(req,res,(found)=>{
+			
+		})
+		items = [question]
+		console.log("3")
+		question.getQuestion(req,res,(found)=>{
+			console.log("4")
+			let pageInfo = {}
+			//console.log(found)
+			pageInfo.cid = req.query.cid
+			pageInfo.data = found.data
+			console.log(pageInfo)
+			res.render("questionPanel",pageInfo)
+		})
+		console.log("5")
+	})
+
+	app.post("/submit",function(req,res){
+		console.log(req.body)
+		score.calculateScore(req,res,(found)=>{
+
+		})
 	})
 
 	app.get('/contest/createContest',function(req,res){
@@ -54,14 +133,29 @@ module.exports = function(app,passport){
 	})
 
 	app.get('/contest/addQuestion',function(req,res){
-		//var id = req.params.cid
-		res.render("contest/createQuestion")
+		var cid = req.query.cid
+		var pageInfo = {}
+		pageInfo.cid = cid
+		res.render("contest/createQuestion",pageInfo)
 	})
 
 	app.post('/contest/addQuestion',function(req,res){
-		question.createQuestion(req,res,(found)=>{
-			
-		})
+
+	 	let sampleFile = req.files.iq1o1;
+ 		question.createQuestion(req,res,(found)=>{
+
+ 		})
+
+ 		/*question.insertImage(req,res,(found)=>{
+
+ 		})*/
+	  // Use the mv() method to place the file somewhere on your server 
+	  /*sampleFile.mv(__dirname+'/abc.jpg', function(err) {
+	    if (err)
+	      return res.status(500).send(err);
+	 
+	    res.send('File uploaded!');
+	  });*/
 	})
 
 	app.post('/login', passport.authenticate('local-login', {

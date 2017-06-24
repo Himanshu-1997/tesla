@@ -289,15 +289,39 @@
                         <div class="panel-body">
                             <h3>Create</h3>
                             <center>
-                                <form action="/contest/addQuestion" method="post">
+                                <form action="/contest/addQuestion" enctype="multipart/form-data" method="post">
                                     <% for(var i=0;i<10;i++){%>
-                                        <h4><input type="checkbox">&nbspQuestion <%=i+1 %></h4>
+                                        <h4>------------Question <%=i+1 %>----------------</h4>
                                         <textarea name="q<%=i+1%>"></textarea><br>
+                                        Option 1<br>
+                                        Insert image for question<br>
+                                        <input type="file" name="iq<%=i+1%>"><br>
                                         <input type="text" placeholder="Option 1" name="q<%=i+1%>o1"><br>
+                                        <!--Insert image for option 1<br>
+                                        <input type="file" name="i<%=i+1%>o1"><br>-->
+                                        Option 2<br>
                                         <input type="text" placeholder="Option 2" name="q<%=i+1%>o2"><br>
+                                        <!--Insert image for option 2<br>
+                                        <input type="file" name="i<%=i+1%>o2"><br>-->
+                                        Option 3<br>
                                         <input type="text" placeholder="Option 3" name="q<%=i+1%>o3"><br>
+                                        <!--Insert image for option 3<br>
+                                        <input type="file" name="i<%=i+1%>o3"><br>-->
+                                        Option 4<br>
                                         <input type="text" placeholder="Option 4" name="q<%=i+1%>o4"><br>
+                                        <!--Insert image for option 4<br>
+                                        <input type="file" name="i<%=i+1%>o4"><br>-->
+                                        <input type="number" name="m<%=i+1%>" value="3"><br>
+                                        <select name="a<%=i+1%>">
+                                            <option>-----Selct correct option------</option>
+                                            <option value="1">Option 1 </option>
+                                            <option value="2">Option 2</option>
+                                            <option value="3">Option 3</option>
+                                            <option value="4">Option 4</option>
+                                        </select>
+
                                     <% } %>
+                                    <input type="hidden" value="<%= cid %>" name="cid">
                                     <input type="submit">
                                 </form>
                             </center>

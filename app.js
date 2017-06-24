@@ -9,6 +9,7 @@ var flash = require('connect-flash');
 var passport = require('passport');
 var path = require('path');
 var fs = require('fs');
+var fileUpload = require('express-fileupload');
 
 var app = express();
 app.use(cookieParser('secret'));
@@ -16,8 +17,8 @@ app.use(session({cookie: { maxAge: 60000 }}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-app.use(bodyParser());
-  
+app.use(bodyParser())
+app.use(fileUpload());
 
 
 app.set('view engine','ejs');
