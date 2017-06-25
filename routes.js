@@ -103,12 +103,10 @@ module.exports = function(app,passport){
 	})
 
 	app.get("/questionPanel",function(req,res){
-		console.log("1")
-		score.checkSubmission(req,res,(found)=>{
-			
+
+		/*score.checkSubmission(req,res,(found)=>{
+
 		})
-		items = [question]
-		console.log("3")
 		question.getQuestion(req,res,(found)=>{
 			console.log("4")
 			let pageInfo = {}
@@ -117,8 +115,41 @@ module.exports = function(app,passport){
 			pageInfo.data = found.data
 			console.log(pageInfo)
 			res.render("questionPanel",pageInfo)
-		})
-		console.log("5")
+		})*/
+		items = [score]
+
+		async.each(items,function(item,callback){
+			item.checkSubmission(req,res,(found)=>{
+				//console.log("1")
+				calc = found.total
+			//	console.log(calc)
+				callback({"total":calc})
+			})
+		},
+		function(founds){
+			question.getQuestion(req,res,(found)=>{
+				//console.log("2")
+				let pageInfo = {}
+				//console.log(found)
+				pageInfo.cid = req.query.cid
+				pageInfo.data = found.data
+				endTime = (found.data)[0].contest.endTime
+				startTime = (found.data)[0].contest.startTime
+				console.log("endTime="+endTime)
+				console.log("startTime="+startTime)
+				//console.log(pageInfo)
+				if(founds.total != 0)
+					res.send("all ready submitted")
+				else if(new Date() > endTime)
+					res.send("contest has ended")
+				else if(new Date() < startTime)
+					res.send("contest not started yet")
+				else
+					res.render("questionPanel",pageInfo)
+			})
+		}
+		)
+		
 	})
 
 	app.post("/submit",function(req,res){
@@ -132,8 +163,8 @@ module.exports = function(app,passport){
 		res.render("contest/createContest")
 	})
 
-	app.get('/contest/addQuestion',function(req,res){
-		var cid = req.query.cid
+	app.get('/contest/addQuestion/:cid',function(req,res){
+		var cid = req.params.cid
 		var pageInfo = {}
 		pageInfo.cid = cid
 		res.render("contest/createQuestion",pageInfo)

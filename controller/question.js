@@ -56,9 +56,18 @@ exports.getQuestion = function(req,res,callback){
 			throw err
 		else{
 			//console.log(data)
-			callback({data:data})
+			console.log("found")
 		}
 
+	}).populate("contest").exec(function(err,story){
+		if(err)
+			throw err
+		else{
+			console.log("-----------------------------------------------")
+			console.log(story)
+			console.log("----------------------------------------------------")
+			callback({"data":story})
+		}
 	})
 	
 

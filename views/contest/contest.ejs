@@ -320,7 +320,7 @@
                                 <td><%= status %></td>
                                 <td>
                                     <% if(status=="Running"){%>
-                                        <a href="">Enter</a>
+                                        <a href="/questionPanel?cid=<%=data[i]._id%>">Enter</a> 
                                     <% }else if(status=="Pending"){%>
                                         <a href="">View</a>
                                     <% }else{ %>
@@ -345,7 +345,7 @@
                                 <td><%= status %></td>
                                 <td>
                                     <% if(status=="Running"){%>
-                                        <a href="">Enter</a>
+                                        <a href="/questionPanel?cid=<%=data[i]._id%>">Enter</a>
                                     <% }else if(status=="Pending"){%>
                                         <a href="">View</a>
                                     <% }else{ %>

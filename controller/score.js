@@ -73,7 +73,7 @@ exports.calculateScore = function(req,res,callback){
 
 exports.checkSubmission = function(req,res,callback){
 	let searchParameter = {}
-	searchParameter.user = "59137728681bea16f0f3bf81"
+	searchParameter.user = req.user._id
 	searchParameter.contest = req.query.cid
 	//console.log(searchParameter)
 	scoreModel.find(searchParameter,function(err,found){

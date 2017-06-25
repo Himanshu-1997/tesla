@@ -269,7 +269,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1 class="page-header">Blank</h1>
+                        <h1 class="page-header" id="demo">Blank</h1>
                         <form action="submit" method="post">
                         <% for(var i=0;i<data.length;i++){%>
                         <div id=="abcd">
@@ -316,4 +316,20 @@
 
 </body>
 
+<!-- Script for countdown timer -->
+<script type="text/javascript">
+    var time = new Date("<%= data[0].contest.endTime %>")  - new Date()
+    console.log(time)
+    time = time/1000
+    var x = setInterval(function(){
+        document.getElementById("demo").innerHTML = time
+        time = time-1
+        if(time<0){
+            clearInterval()
+            alert("Time is over")
+            location.href = "/ok"
+
+        }
+    },1000)
+</script>
 </html>
