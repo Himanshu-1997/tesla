@@ -48,7 +48,7 @@ exports.createQuestion = function(req,res,callback){
 }
 
 exports.getQuestion = function(req,res,callback){
-	cid = req.query.cid
+	cid = req.params.cid
 	searchParameter = {}
 	searchParameter.contest = cid
 	questionModel.find(searchParameter,(err,data)=>{

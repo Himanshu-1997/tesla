@@ -31,11 +31,13 @@ function isLoggedIn(req,res,next){
 		res.redirect('auth');
 }
 
-isAdmin = function(req,res){
+ function isAdmin(req,res,next){
 	if(req.user.group==4){
-		return true;
+		return next();
 	}
-	return false;
+	else{
+		res.redirect("/dashboard")
+	}
 }
 
 
@@ -49,7 +51,11 @@ module.exports = function(app,passport){
 			pageInfo.menu = found.menu
 
 		})
-		pageInfo.group = isAdmin(req,res)
+		if(req.user.group == 4)
+			pageInfo.isAdmin = true
+		else
+			pageInfo.isAdmin = false
+		//pageInfo.group = isAdmin(req,res)
 		res.render("dashboard",pageInfo)
 	})
 
@@ -69,7 +75,7 @@ module.exports = function(app,passport){
 
 
 
-	app.get('/contest',function(req,res){
+	app.get('/contest',isLoggedIn,function(req,res){
 		var pageInfo = {}
 		batch.menuItems((found)=>{
 			pageInfo.menu = found.menu
@@ -92,7 +98,7 @@ module.exports = function(app,passport){
 		
 	})
 
-	app.get("/viewSolution",function(req,res){
+	app.get("/viewSolution/:cid",isLoggedIn,isAdmin,function(req,res){
 		question.getQuestion(req,res,(found)=>{
 			let pageInfo = {}
 			//console.log(found)
@@ -102,7 +108,7 @@ module.exports = function(app,passport){
 		})
 	})
 
-	app.get("/questionPanel",function(req,res){
+	app.get("/questionPanel/:cid",isLoggedIn,isAdmin,function(req,res){
 
 		/*score.checkSubmission(req,res,(found)=>{
 
@@ -152,25 +158,44 @@ module.exports = function(app,passport){
 		
 	})
 
-	app.post("/submit",function(req,res){
+	app.get("/editContest",isLoggedIn,isAdmin,function(req,res){
+		let pageInfo = {}
+		batch.adminMenu((found)=>{
+			pageInfo.menu = found.adminMenu
+		})
+		items = [contest]
+		async.each(items,function(item,callback){
+			item.getContest(req,res,(founds)=>{
+				pageInfo.data = founds.data
+				callback();
+			})
+		},
+		function(){
+			status = ""
+			res.render("contest/editContest",pageInfo)
+		}
+		)
+	})
+
+	app.post("/submit",isLoggedIn,function(req,res){
 		console.log(req.body)
 		score.calculateScore(req,res,(found)=>{
 
 		})
 	})
 
-	app.get('/contest/createContest',function(req,res){
+	app.get('/contest/createContest',isLoggedIn,isAdmin,function(req,res){
 		res.render("contest/createContest")
 	})
 
-	app.get('/contest/addQuestion/:cid',function(req,res){
+	app.get('/contest/addQuestion/:cid',isLoggedIn,isAdmin,function(req,res){
 		var cid = req.params.cid
 		var pageInfo = {}
 		pageInfo.cid = cid
 		res.render("contest/createQuestion",pageInfo)
 	})
 
-	app.post('/contest/addQuestion',function(req,res){
+	app.post('/contest/addQuestion',isLoggedIn,isAdmin,function(req,res){
 
 	 	let sampleFile = req.files.iq1o1;
  		question.createQuestion(req,res,(found)=>{
@@ -202,7 +227,7 @@ module.exports = function(app,passport){
 	}))
 
 
-	app.post('/contest/createContest',function(req,res){
+	app.post('/contest/createContest',isLoggedIn,isAdmin,function(req,res){
 		contest.createContest(req,res,(found)=>{
 
 		})

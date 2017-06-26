@@ -12,13 +12,23 @@ var fs = require('fs');
 var fileUpload = require('express-fileupload');
 
 var app = express();
-app.use(cookieParser('secret'));
-app.use(session({cookie: { maxAge: 60000 }}));
+
+app.use(cookieParser());
+app.use(session({ 
+  secret: 'lololppapadhoclabadhoclab',
+  name: 'sessionId',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    //secure:   true,
+    maxAge:   24*60*60*1000 } 
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use(bodyParser())
 app.use(fileUpload());
+
 
 
 app.set('view engine','ejs');

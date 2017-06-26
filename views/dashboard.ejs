@@ -278,6 +278,9 @@
                             <a href="<%= menu[i].url %>"><i class="fa fa-dashboard fa-fw"></i><%= menu[i].name %></a>
                         </li>
                         <% } %>
+                        <% if(isAdmin == true){%>
+                            <li><a href="">Go to Admin Panel</a></li>
+                        <% } %>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
