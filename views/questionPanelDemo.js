@@ -2,84 +2,7 @@
 <html lang="en">
 
 <head>
-    <script type="text/javascript">
-        /*var counter = 0;
-        function next(){
-            counter = counter + 1;
-        }
 
-        function prev(){
-            counter = counter + 1;
-        }
-        function changeQuestion(n){
-            
-
-        }*/
-        var counter = 0
-        n = parseInt("<%= data.length %>")
-        var questions = new Array(n)
-        for(var i=0;i<n;i++){
-            questions[i] = "q"+i
-        }
-        function next1(){
-            console.log(counter)
-            console.log(n)
-            if(counter!=n-1){
-                counter++
-                changeQuestion(counter)
-            }
-        }
-
-        function prev(){
-            if(counter!=0){
-                counter--
-                changeQuestion(counter)
-            }
-        }
-
-        function save(){
-            //console.log("i am counter no :-"+counter)
-            //console.log(counter.toString())
-            document.getElementById(counter.toString()).style.backgroundColor = "darkred"
-            next1()
-        }
-        function changeQuestion(question){
-            
-
-            question = parseInt(question)
-            counter = question 
-            //console.log("i am counter number "+counter)
-            for(var i=0;i<n;i++){
-                if(parseInt(counter)==parseInt(i)){
-                     if(document.getElementById(i.toString()).style.backgroundColor != "darkred")
-                            document.getElementById(counter.toString()).style.backgroundColor = "lightgreen"
-                }
-                else{
-                    if(document.getElementById(i.toString()).style.backgroundColor != "darkred")
-                        document.getElementById(i.toString()).style.backgroundColor = "black"
-                }
-            }
-            var tmp = "q"+counter
-            for(var i=0;i<questions.length;i++){
-                question = questions[i]
-                div = document.getElementById(question)
-
-                if(tmp==question){
-                    div.style.display = "block"
-                }
-                else
-                    div.style.display = "none"
-            }
-        }
-    </script>
-    <style type="text/css">
-        .sqbtn{
-            width: 40px;
-            height: 40px;
-            background-color: black;
-            color: white
-        }
-    </style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -110,7 +33,7 @@
 
 </head>
 
-<body onload="changeQuestion(0)">
+<body>
 
     <div id="wrapper">
 
@@ -337,39 +260,33 @@
             </ul>
             <!-- /.navbar-top-links -->
 
-            <div class="navbar-default sidebar" role="navigation">
-            <br><br>
-                <div class="sidebar-nav navbar-collapse" style="background-color: red;padding-top: 10px;padding-left: 10px;padding-bottom: 10px">
-                    <% for(var i=0;i<data.length;i++){ %>
-                        <input type="button" name="" class="sqbtn" id="<%= i %>" value="<%=i+1%>" onclick="changeQuestion('<%= i %>')">
-                    <% } %>
-                </div>
-                <!-- /.sidebar-collapse -->
-            </div>
+            
             <!-- /.navbar-static-side -->
         </nav>
 
         <!-- Page Content -->
-        <div id="page-wrapper" style="background-color: black">
+        <div id="page-wrapper">
             <div class="container-fluid">
-                <div class="row" >
-                    <div class="col-lg-12 " >
+                <div class="row">
+                    <div class="col-lg-12">
                         <h1 class="page-header" id="demo">Blank</h1>
-                        <form action="/submit" method="post">
+                        <form action="submit" method="post">
                         <% for(var i=0;i<data.length;i++){%>
-                            <div id="q<%=i %>" style="display: none;">
-                            <h3 style="color: green">Q<%= i+1 %>.<%= data[i].question %></h3>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option1 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option2 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option3 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option4 %></h4><br>
+                        <div id=="abcd">
+                            <h3>Q<%= i+1 %>:-<%= data[i].question %></h3>
+                            <h4><input type="radio" name="<%= data[i]._id %>" value="1"> <%= data[i].option1 %></h4>
+                            <h4><input type="radio" name="<%= data[i]._id %>" value="2"> <%=data[i].option2 %></h4>
+                            <h4><input type="radio" name="<%= data[i]._id %>" value="3"> <%=data[i].option3 %></h4>
+                            <h4><input type="radio" name="<%= data[i]._id %>" value="4"> <%=data[i].option4 %></h4>
+                            
+                            ----------------------------------------------------------------
+                            ---------------------------------------------------------------------------------------------------------------------------------<br>
+                            ----------------------------------------------------------------
+                            ---------------------------------------------------------------------------------------------------------------------------------
 
-                            </div>
+                        </div>
                         <% } %>
-                        <input type="button" id="next" value="next" onclick="next1()">
-                        <input type="button" value="previous" onclick="prev()">
-                        <input type="hidden" name="cid" value="<%= cid %>" >
-                        <input type="button" value="Save and continue" onclick="save()">
+                        <input type="hidden" name="cid" value="<%= cid %>">
                         <input type="submit" value="SUBMIT AND EXIT">
                         </form>
                         
@@ -405,7 +322,7 @@
     console.log(time)
     time = time/1000
     var x = setInterval(function(){
-        document.getElementById("demo").innerHTML = parseInt(time)
+        document.getElementById("demo").innerHTML = time
         time = time-1
         if(time<0){
             clearInterval()

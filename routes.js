@@ -27,8 +27,10 @@ var a = 5
 function isLoggedIn(req,res,next){
 	if(req.isAuthenticated())
 		return next();
-	else
-		res.redirect('auth');
+	else{
+		req.flash('errorMessages','You must be login to view the page')
+		res.redirect('/auth');
+	}
 }
 
  function isAdmin(req,res,next){
@@ -36,6 +38,7 @@ function isLoggedIn(req,res,next){
 		return next();
 	}
 	else{
+		req.flash('errorMessages','You dont have sufficient privillage to view the previous page')
 		res.redirect("/dashboard")
 	}
 }
@@ -56,6 +59,7 @@ module.exports = function(app,passport){
 		else
 			pageInfo.isAdmin = false
 		//pageInfo.group = isAdmin(req,res)
+		pageInfo.flash = req.flash("errorMessages")
 		res.render("dashboard",pageInfo)
 	})
 
@@ -69,6 +73,7 @@ module.exports = function(app,passport){
 				pageInfo.batch = found.batch;
 				pageInfo.course = found.course;
 				pageInfo.branch = found.branch;
+				pageInfo.messages = req.flash('errorMessages')
 				res.render('authentication',pageInfo);
 			})
 	})
@@ -108,8 +113,57 @@ module.exports = function(app,passport){
 		})
 	})
 
-	app.get("/questionPanel/:cid",isLoggedIn,isAdmin,function(req,res){
+	app.get("/questionPanel/:cid",isLoggedIn,function(req,res){
 
+		/*score.checkSubmission(req,res,(found)=>{
+
+		})
+		question.getQuestion(req,res,(found)=>{
+			console.log("4")
+			let pageInfo = {}
+			//console.log(found)
+			pageInfo.cid = req.query.cid
+			pageInfo.data = found.data
+			console.log(pageInfo)
+			res.render("questionPanel",pageInfo)
+		})*/
+		items = [score]
+
+		async.each(items,function(item,callback){
+			item.checkSubmission(req,res,(found)=>{
+				//console.log("1")
+				calc = found.total
+			//	console.log(calc)
+				callback({"total":calc})
+			})
+		},
+		function(founds){
+			question.getQuestion(req,res,(found)=>{
+				//console.log("2")
+				let pageInfo = {}
+				//console.log(found)
+				pageInfo.cid = req.params.cid
+				pageInfo.data = found.data
+				endTime = (found.data)[0].contest.endTime
+				startTime = (found.data)[0].contest.startTime
+				console.log("endTime="+endTime)
+				console.log("startTime="+startTime)
+				//console.log(pageInfo)
+				if(founds.total != 0)
+					res.send("all ready submitted")
+				else if(new Date() > endTime)
+					res.send("contest has ended")
+				else if(new Date() < startTime)
+					res.send("contest not started yet")
+				else
+					res.render("questionPanel",pageInfo)
+			})
+		}
+		)
+		
+	})
+
+	app.get("/question/questionPanel/:cid",function(req,res){
 		/*score.checkSubmission(req,res,(found)=>{
 
 		})
@@ -151,11 +205,10 @@ module.exports = function(app,passport){
 				else if(new Date() < startTime)
 					res.send("contest not started yet")
 				else
-					res.render("questionPanel",pageInfo)
+					res.render("/questionPanelDemo",pageInfo)
 			})
 		}
 		)
-		
 	})
 
 	app.get("/editContest",isLoggedIn,isAdmin,function(req,res){
@@ -216,13 +269,13 @@ module.exports = function(app,passport){
 
 	app.post('/login', passport.authenticate('local-login', {
         successRedirect : '/dashboard', // redirect to the secure profile section
-        failureRedirect : '/abc', // redirect back to the signup page if there is an error
+        failureRedirect : '/auth', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
 
 	app.post('/register',passport.authenticate('local-signup',{
 		successRedirect :  '/dashboard',
-		failureRedirect :  '/error',
+		failureRedirect :  '/auth',
 		failureFlash    :  true
 	}))
 
@@ -234,6 +287,10 @@ module.exports = function(app,passport){
 		
 	})
 
+	app.get("/logout",isLoggedIn,function(req,res){
+		req.logout()
+		res.redirect("/auth")
+	})
 
 
 

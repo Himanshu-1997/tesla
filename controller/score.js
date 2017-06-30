@@ -7,31 +7,6 @@ exports.calculateScore = function(req,res,callback){
 	//console.log(req.body)
 	var len = Object.keys(req.body).length
 	var tostr = Object.keys(req.body)
-	/*for(var i=0;i<len-1;i++){
-		var qid = tostr[i]
-		var attemptAnswer = req.body.qid
-		console.log("1")
-		items = []
-		async.each(items,function(item,callback){
-			item.findOne({"_id":qid},function(err,data){
-				if(err)
-					throw err
-				else{
-					console.log(2)
-					//if(data.answer == req.body)
-				}
-
-				callback()
-				
-			})
-		},
-		function(){
-			console.log("3")
-
-
-		}
-
-		)*/
 		items = []
 
 		for(var i=0;i<len-1;i++){
