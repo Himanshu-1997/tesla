@@ -292,6 +292,19 @@ module.exports = function(app,passport){
 		res.redirect("/auth")
 	})
 
+	app.get("/viewResult/:cid",isLoggedIn,function(req,res){
+		var pageInfo = {}
+		batch.menuItems((found)=>{
+			pageInfo.menu = found.menu
+		})
+		score.showScore(req,res,(found)=>{
+			
+			pageInfo.data = found.data
+			pageInfo.currentUserId = req.user._id
+			res.render("showResult",pageInfo)
+		})
+	})
+
 
 
 	

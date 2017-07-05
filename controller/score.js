@@ -18,10 +18,12 @@ exports.calculateScore = function(req,res,callback){
 				if(err)
 					throw err
 				else{
+					console.log("------------------------")
+					console.log(data.answer)
+					console.log(req["body"][item])
+					console.log("@@@@@@@@@@@@@@@@@@@@@@@@@")
 					if(data.answer == req["body"][item])
 						score = score + 3
-					else
-						score = score - 1
 
 				}
 				callback()
@@ -32,7 +34,8 @@ exports.calculateScore = function(req,res,callback){
 					'user' 		    : req.user._id,
 					'contest'	    : req.body.cid,
 					'score'		    : score,
-					'submitTime'    : new Date()
+					'submitTime'    : new Date(),
+					
 				}).save(function(err,data){
 					if(err)
 						throw err
@@ -59,4 +62,18 @@ exports.checkSubmission = function(req,res,callback){
 			callback({"total":found.length})
 		}
 	})
+}
+
+exports.showScore = function(req,res,callback){
+	var cid = req.params.cid
+	searchParameter = {}
+	searchParameter.contest = cid
+	scoreModel.find(searchParameter,(err,data)=>{
+	}).populate("user").populate("contest").exec(function(err,found){
+		if(err)
+			throw err
+		else
+			callback({'data':found})
+	})
+
 }

@@ -2,84 +2,7 @@
 <html lang="en">
 
 <head>
-    <script type="text/javascript">
-        /*var counter = 0;
-        function next(){
-            counter = counter + 1;
-        }
 
-        function prev(){
-            counter = counter + 1;
-        }
-        function changeQuestion(n){
-            
-
-        }*/
-        var counter = 0
-        n = parseInt("<%= data.length %>")
-        var questions = new Array(n)
-        for(var i=0;i<n;i++){
-            questions[i] = "q"+i
-        }
-        function next1(){
-            console.log(counter)
-            console.log(n)
-            if(counter!=n-1){
-                counter++
-                changeQuestion(counter)
-            }
-        }
-
-        function prev(){
-            if(counter!=0){
-                counter--
-                changeQuestion(counter)
-            }
-        }
-
-        function save(){
-            //console.log("i am counter no :-"+counter)
-            //console.log(counter.toString())
-            document.getElementById(counter.toString()).style.backgroundColor = "darkred"
-            next1()
-        }
-        function changeQuestion(question){
-            
-
-            question = parseInt(question)
-            counter = question 
-            //console.log("i am counter number "+counter)
-            for(var i=0;i<n;i++){
-                if(parseInt(counter)==parseInt(i)){
-                     if(document.getElementById(i.toString()).style.backgroundColor != "darkred")
-                            document.getElementById(counter.toString()).style.backgroundColor = "lightgreen"
-                }
-                else{
-                    if(document.getElementById(i.toString()).style.backgroundColor != "darkred")
-                        document.getElementById(i.toString()).style.backgroundColor = "black"
-                }
-            }
-            var tmp = "q"+counter
-            for(var i=0;i<questions.length;i++){
-                question = questions[i]
-                div = document.getElementById(question)
-
-                if(tmp==question){
-                    div.style.display = "block"
-                }
-                else
-                    div.style.display = "none"
-            }
-        }
-    </script>
-    <style type="text/css">
-        .sqbtn{
-            width: 40px;
-            height: 40px;
-            background-color: black;
-            color: white
-        }
-    </style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -110,7 +33,7 @@
 
 </head>
 
-<body onload="changeQuestion(0)">
+<body>
 
     <div id="wrapper">
 
@@ -338,11 +261,26 @@
             <!-- /.navbar-top-links -->
 
             <div class="navbar-default sidebar" role="navigation">
-            <br><br>
-                <div class="sidebar-nav navbar-collapse" style="background-color: red;padding-top: 10px;padding-left: 10px;padding-bottom: 10px">
-                    <% for(var i=0;i<data.length;i++){ %>
-                        <input type="button" name="" class="sqbtn" id="<%= i %>" value="<%=i+1%>" onclick="changeQuestion('<%= i %>')">
-                    <% } %>
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li class="sidebar-search">
+                            <div class="input-group custom-search-form">
+                                <input type="text" class="form-control" placeholder="Search..." >
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <!-- /input-group -->
+                        </li>
+                        <% for(var i=0;i<menu.length;i++){%>
+                        <li>
+                            <a href="<%= menu[i].url %>"><i class="fa fa-dashboard fa-fw"></i><%= menu[i].name %></a>
+                        </li>
+                        <% } %>
+                        
+                    </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
             </div>
@@ -350,29 +288,52 @@
         </nav>
 
         <!-- Page Content -->
-        <div id="page-wrapper" style="background-color: black">
+        <div id="page-wrapper">
             <div class="container-fluid">
-                <div class="row" >
-                    <div class="col-lg-12 " >
-                        <h1 class="page-header" id="demo">Blank</h1>
-                        <form action="/submit" method="post">
-                        <% for(var i=0;i<data.length;i++){%>
-                            <div id="q<%=i %>" style="display: none;">
-                            <h3 style="color: green">Q<%= i+1 %>.<%= data[i].question %></h3>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="1">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option1 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="2">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option2 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="3">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option3 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="4">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option4 %></h4><br>
-
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">Blank</h1>
+                        <div class="input-group custom-search-form">
+                                <input type="text" class="form-control" placeholder="Search..." id="filter" onkeyup="search()">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
                             </div>
-                        <% } %>
-                        <input type="button" id="next" value="next" onclick="next1()">
-                        <input type="button" value="previous" onclick="prev()">
-                        <input type="hidden" name="cid" value="<%= cid %>" >
-                        <input type="button" value="Save and continue" onclick="save()">
-                        <input type="submit" value="SUBMIT AND EXIT">
-                        </form>
-                        
+                        <table class="table table-hover" id="mytable">
+                            <thead>
+                              <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                                <th>Time(Sec)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            <% for(var i=0;i<data.length;i++){%>
+
+                                <% if(data[i].user._id == currentUserId) {%>
+                                    <tr style="background-color: red">
+                                        <td><%= i+1 %></td>
+                                        <td><h4><%= data[i].user.firstName %></h4></td>
+                                        <td><h4><%= data[i].score %></h4></td>
+                                        <td><h4><%= parseInt((data[i].submitTime - data[i].contest.startTime)/1000)  %></h4></td>
+                                    </tr>
+                               <% } else{ %>
+                                    <tr>
+                                        <td><%= i+1 %></td>
+                                        <td><h4><%= data[i].user.firstName %></h4></td>
+                                        <td><h4><%= data[i].score %></h4></td>
+                                        <td><h4><%= parseInt((data[i].submitTime - data[i].contest.startTime)/1000)  %></h4></td>
+                                    </tr>
+                                <% } %>
+
+
+                             <% } %>
+
+                            </tbody>
+                          </table>
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
@@ -398,30 +359,27 @@
     <script src="../dist/js/sb-admin-2.js"></script>
 
 </body>
-
-<!-- Script for countdown timer -->
 <script type="text/javascript">
-    var time = new Date("<%= data[0].contest.endTime %>")  - new Date()
-    console.log(time)
-    time = time/1000
+    function search(){
+        var table;
+        table = document.getElementById("mytable")
+        var tr = table.getElementsByTagName("tr")
+        console.log(tr)
+        var search = document.getElementById("filter").value.toUpperCase()
+        for(var i=1;i<tr.length;i++){
+            td = tr[i].getElementsByTagName("td")[1];
+            console.log(td.innerHTML)
+            if(td){
+                if(td.innerHTML.toUpperCase().indexOf(search) > -1){
+                    tr[i].style.display = ""
+                }
+                else{
+                    tr[i].style.display = "none"
+                }
+            }
+        }
+    }
     
 
-    var x = setInterval(function(){
-        var days = parseInt(time/86400)
-        var hours = parseInt(time/3600)%(24*days)
-        var minutes = parseInt(time/60)%60
-        var seconds = parseInt(time % 60)
-
-        var result = (days!=0? days + "days" + " " : "") + (hours!=0?hours + "h" + " " : "") + (minutes!=0?minutes + "min" + " " : "") + seconds + "sec"
-        //var result = days + "days" + " " + hours + "h" + " " + minutes + "min" + " " + seconds + "sec"
-        document.getElementById("demo").innerHTML = result 
-        time = time-1
-        if(time<0){
-            clearInterval()
-            alert("Time is over")
-            location.href = "/ok"
-
-        }
-    },1000)
 </script>
 </html>
