@@ -98,22 +98,58 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">Blank</h1>
-                        <% for(var i=0;i<data.length;i++){%>
-                        <div id=="abcd">
-                            <h3>Q<%= i+1 %>:-<%= data[i].question %></h3>
-                            <h4>1.<%= data[i].option1 %></h4>
-                            <h4>2.<%=data[i].option2 %></h4>
-                            <h4>3.<%=data[i].option3 %></h4>
-                            <h4>4.<%=data[i].option4 %></h4>
-                            <h4>Answer:-<%= data[i].answer %></h4>
-                            ----------------------------------------------------------------
-                            ---------------------------------------------------------------------------------------------------------------------------------<br>
-                            ----------------------------------------------------------------
-                            ---------------------------------------------------------------------------------------------------------------------------------
+                        <table class="table table-hover">
+                            <thead>
+                              <tr>
+                                <th>Contest</th>
+                                <th>Type</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            <% for(var i=0;i<data.length;i++){%>
+                            <% if(i%2==0){ %>
+                              <tr>
+                                <td><%= data[i].contestName %></td>
+                                <td><%= data[i].contestType %></td>
+                                <td><%= data[i].startTime  %></td>
+                                <% var status = "" %>
+                                <% if(data[i].endTime < new Date()) {%>
+                                    <%  status = "Completed" %>
+                                <% }else if((data[i].startTime - new Date())>0) {%>
+                                    <% status = "Pending" %>
+                                <% }else{ %>
+                                <% status = "Running" %>
+                                <% } %>
+                                <td><%= status %></td>
+                                <td><a href="/contest/addQuestion/<%= data[0]._id%>"><span class="glyphicon glyphicon-plus"></span></a><a href="#"><span class="glyphicon glyphicon-pencil"></span></a><a href="#"><span class="glyphicon glyphicon-trash"></span></a><a href="questionPanel/<%=data[i]._id %>"><span class="glyphicon glyphicon-eye-open"></span></a></td>
+                              </tr>
+                            <% }else{ %>
+                            <tr class="danger">
+                                <td><%= data[i].contestName %></td>
+                                <td><%= data[i].contestType %></td>
+                                <td><%= data[i].startTime  %></td>
+                                <% var status = "" %>
+                                <% if(data[i].endTime < new Date()) {%>
+                                    <%  status = "Completed" %>
+                                <% }else if((data[i].startTime - new Date())>0) {%>
+                                    <% status = "Pending" %>
+                                <% }else{ %>
+                                <% status = "Running" %>
+                                <% } %>
+                                <td><%= status %></td>
+                                <td><a href="/contest/addQuestion/<%= data[i]._id%>"><span class="glyphicon glyphicon-plus"></span></a><a href="#"><span class="glyphicon glyphicon-pencil"></span></a><a href="#"><span class="glyphicon glyphicon-trash"></span></a><a href="questionPanel/<%=data[0]._id %>"><span class="glyphicon glyphicon-eye-open"></span></a></td>
+                                
+                            </tr>
+                             <% } %>
 
-                        </div>
-                        <% } %>
-                        
+
+                             <% } %>
+
+                            </tbody>
+                          </table>
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>

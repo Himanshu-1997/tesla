@@ -5,7 +5,7 @@ var async = require('async')
 const questionModel = mongoose.model('Question')
 const contestModel = mongoose.model('Contest')
 
-exports.createQuestion = function(req,res,callback){
+exports.createQuestion = function(req,callback){
 	let cid = req.body.cid
 	
 	let data = req["body"]
@@ -47,26 +47,29 @@ exports.createQuestion = function(req,res,callback){
 	}
 }
 
-exports.getQuestion = function(req,res,callback){
-	cid = req.params.cid
+exports.getQuestion = function(key,callback){
+	cid = key
 	searchParameter = {}
 	searchParameter.contest = cid
 	questionModel.find(searchParameter,(err,data)=>{
-		if(err)
-			throw err
+		if(err){
+			console.log(err)
+		}
 		else{
 			//console.log(data)
 			console.log("found")
 		}
 
 	}).populate("contest").exec(function(err,story){
-		if(err)
-			throw err
+		if(err){
+			console.log(err);
+			callback({"res":false})
+		}
 		else{
 			console.log("-----------------------------------------------")
 			console.log(story)
 			console.log("----------------------------------------------------")
-			callback({"data":story})
+			callback({"data":story,"res":true})
 		}
 	})
 	

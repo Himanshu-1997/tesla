@@ -2,29 +2,13 @@ const batch = require('./lib/lib.js');
 const contest = require('./controller/contest.js');
 const question = require('./controller/question.js');
 const score = require('./controller/score.js')
-var formidable = require('formidable');
-var fs = require('fs');
-var async = require('async')
+const formidable = require('formidable');
+const fs = require('fs');
+const async = require('async')
 
-
-/*var multer = require('multer');
-var storage = multer.diskStorage({
-	destination: function(req,file,cb){
-		cb(null,__dirname+'/public/images/tesla/')
-	},
-	filename: function(req,file,cb){
-		console.log(req.body)
-		console.log("---------------------")
-		console.log(file.originalname)
-		cb(null,file.originalname);
-	}
-});
-
-var upload = multer({ storage:storage });*/
-
-var a = 5
 
 function isLoggedIn(req,res,next){
+	/*This function chek weather the user is logged in or not */
 	if(req.isAuthenticated())
 		return next();
 	else{
@@ -34,6 +18,7 @@ function isLoggedIn(req,res,next){
 }
 
  function isAdmin(req,res,next){
+ 	/*This function cheks weather the user is admin or not */
 	if(req.user.group==4){
 		return next();
 	}
@@ -46,19 +31,20 @@ function isLoggedIn(req,res,next){
 
 
 module.exports = function(app,passport){
+    //all the routes to the application 
+    /*list of all the get methods*/
+
+	app.get('/',(req,res)=>{
+		res.redirect("/auth")
+	})
 
 	app.get('/dashboard',isLoggedIn,function(req,res){
 		var pageInfo = {};
+		pageInfo.user = req.user;
 		batch.menuItems((found)=>{
 			pageInfo.title = "Dashboard"
 			pageInfo.menu = found.menu
-
 		})
-		if(req.user.group == 4)
-			pageInfo.isAdmin = true
-		else
-			pageInfo.isAdmin = false
-		//pageInfo.group = isAdmin(req,res)
 		pageInfo.flash = req.flash("errorMessages")
 		res.render("dashboard",pageInfo)
 	})
@@ -78,138 +64,114 @@ module.exports = function(app,passport){
 			})
 	})
 
-
-
 	app.get('/contest',isLoggedIn,function(req,res){
 		var pageInfo = {}
+		pageInfo.title = "Contests"
+		pageInfo.user = req.user;
+		pageInfo.flash = req.flash("errorMessages");
 		batch.menuItems((found)=>{
 			pageInfo.menu = found.menu
 		})
-		items = [contest]
 
+		items = [contest]
 		async.each(items,function(item,callback){
-			item.getContest(req,res,(founds)=>{
-				pageInfo.data = founds.data
-				callback();
+			item.getContest((founds)=>{
+				if(founds.res == true && founds.data.length>0){
+					pageInfo.data = founds.data
+					callback();
+				}
+				else if(founds.data.length==0){
+					req.flash('errorMessages','Currently there is no contest')
+					res.redirect('/dashboard');
+				}
+				else
+					res.render("error");
 			})
 		},
 		function(){
-			status = ""
-			res.render("contest/contest",pageInfo)
-		}
-		)
-		//pageInfo.datas = "helloworld"
-		
-		
+			res.render("contest",pageInfo)
+		})
 	})
 
 	app.get("/viewSolution/:cid",isLoggedIn,isAdmin,function(req,res){
-		question.getQuestion(req,res,(found)=>{
-			let pageInfo = {}
-			//console.log(found)
-			pageInfo.data = found.data
-			console.log(pageInfo)
-			res.render("viewSolution",pageInfo)
+		let pageInfo = {}
+		batch.adminMenu((found)=>{
+			pageInfo.menu = found.adminMenu
+		})
+
+		var searchParam = req.params.cid;
+		question.getQuestion(searchParam,(found)=>{
+			if(found.res==true && found.data.length>0){
+				pageInfo.data = found.data
+				console.log(pageInfo)
+				res.render("viewSolution",pageInfo)
+			}
+			else if(found.data.length == 0){
+				req.flash('errorMessages','There is no question in the requested contest')
+				res.redirect('/dashboard');
+			}
+			else{
+				res.render("error");
+			}
 		})
 	})
 
 	app.get("/questionPanel/:cid",isLoggedIn,function(req,res){
-
-		/*score.checkSubmission(req,res,(found)=>{
-
-		})
-		question.getQuestion(req,res,(found)=>{
-			console.log("4")
-			let pageInfo = {}
-			//console.log(found)
-			pageInfo.cid = req.query.cid
-			pageInfo.data = found.data
-			console.log(pageInfo)
-			res.render("questionPanel",pageInfo)
-		})*/
 		items = [score]
-
 		async.each(items,function(item,callback){
-			item.checkSubmission(req,res,(found)=>{
-				//console.log("1")
-				calc = found.total
-			//	console.log(calc)
-				callback({"total":calc})
+			let userId = req.user._id
+			let contestId = req.params.cid
+			item.checkSubmission(userId,contestId,(found)=>{
+				if(found["res"]==true){
+					calc = found.total
+					callback({"total":calc})
+				}
+				else{
+					res.render("error")
+				}
 			})
 		},
 		function(founds){
-			question.getQuestion(req,res,(found)=>{
-				//console.log("2")
+			var searchParam = req.params.cid;
+			question.getQuestion(searchParam,(found)=>{
 				let pageInfo = {}
-				//console.log(found)
-				pageInfo.cid = req.params.cid
-				pageInfo.data = found.data
-				endTime = (found.data)[0].contest.endTime
-				startTime = (found.data)[0].contest.startTime
-				console.log("endTime="+endTime)
-				console.log("startTime="+startTime)
-				//console.log(pageInfo)
-				if(founds.total != 0)
-					res.send("all ready submitted")
-				else if(new Date() > endTime)
-					res.send("contest has ended")
-				else if(new Date() < startTime)
-					res.send("contest not started yet")
-				else
-					res.render("questionPanel",pageInfo)
+				if(found["res"]==true && found.data.length>0){
+					pageInfo.cid = req.params.cid
+					pageInfo.data = found.data
+					endTime = (found.data)[0].contest.endTime
+					startTime = (found.data)[0].contest.startTime
+					console.log("endTime="+endTime)
+					console.log("startTime="+startTime)
+					if(founds.total != 0){
+						req.flash('errorMessages','You have allready submitted the paper!!!')
+						res.redirect('/contest');
+					}
+					else if(new Date() > endTime){
+						req.flash('errorMessages','Contest is over!!!')
+						res.redirect('/contest');
+					}
+					else if(new Date() < startTime){
+						req.flash('errorMessages','Contest has not started yet!!!')
+						res.redirect('/contest');
+					}
+					else
+						res.render("questionPanel",pageInfo)
+				}
+				else if(found.data.length == 0){
+					//redirect with no data found;
+					req.flash('errorMessages','There is no question in the requested question panel')
+					res.redirect('/contest');
+				}
+				else{
+					console.log("hello")
+
+					res.render("error")
+				}
 			})
-		}
-		)
-		
-	})
-
-	app.get("/question/questionPanel/:cid",function(req,res){
-		/*score.checkSubmission(req,res,(found)=>{
-
 		})
-		question.getQuestion(req,res,(found)=>{
-			console.log("4")
-			let pageInfo = {}
-			//console.log(found)
-			pageInfo.cid = req.query.cid
-			pageInfo.data = found.data
-			console.log(pageInfo)
-			res.render("questionPanel",pageInfo)
-		})*/
-		items = [score]
-
-		async.each(items,function(item,callback){
-			item.checkSubmission(req,res,(found)=>{
-				//console.log("1")
-				calc = found.total
-			//	console.log(calc)
-				callback({"total":calc})
-			})
-		},
-		function(founds){
-			question.getQuestion(req,res,(found)=>{
-				//console.log("2")
-				let pageInfo = {}
-				//console.log(found)
-				pageInfo.cid = req.query.cid
-				pageInfo.data = found.data
-				endTime = (found.data)[0].contest.endTime
-				startTime = (found.data)[0].contest.startTime
-				console.log("endTime="+endTime)
-				console.log("startTime="+startTime)
-				//console.log(pageInfo)
-				if(founds.total != 0)
-					res.send("all ready submitted")
-				else if(new Date() > endTime)
-					res.send("contest has ended")
-				else if(new Date() < startTime)
-					res.send("contest not started yet")
-				else
-					res.render("/questionPanelDemo",pageInfo)
-			})
-		}
-		)
 	})
+
+	
 
 	app.get("/editContest",isLoggedIn,isAdmin,function(req,res){
 		let pageInfo = {}
@@ -218,53 +180,80 @@ module.exports = function(app,passport){
 		})
 		items = [contest]
 		async.each(items,function(item,callback){
-			item.getContest(req,res,(founds)=>{
-				pageInfo.data = founds.data
-				callback();
+			item.getContest((founds)=>{
+				if(found["res"] == true && found.data.length>0){
+					pageInfo.data = founds.data
+					callback();
+				}
+				else if(found.data.length==0){
+					req.flash('errorMessages','There is no contest to edit')
+					res.redirect('/dashboard');
+				}
+				else
+					res.render("error");
 			})
 		},
 		function(){
-			status = ""
-			res.render("contest/editContest",pageInfo)
-		}
-		)
-	})
-
-	app.post("/submit",isLoggedIn,function(req,res){
-		console.log(req.body)
-		score.calculateScore(req,res,(found)=>{
-
+			res.render("editContest",pageInfo)
 		})
 	})
 
 	app.get('/contest/createContest',isLoggedIn,isAdmin,function(req,res){
-		res.render("contest/createContest")
+		let pageInfo = {}
+		batch.adminMenu((found)=>{
+			pageInfo.menu = found.adminMenu
+		})
+		res.render("createContest",pageInfo)
 	})
 
 	app.get('/contest/addQuestion/:cid',isLoggedIn,isAdmin,function(req,res){
 		var cid = req.params.cid
 		var pageInfo = {}
+		batch.adminMenu((found)=>{
+			pageInfo.menu = found.adminMenu
+		})
 		pageInfo.cid = cid
-		res.render("contest/createQuestion",pageInfo)
+		res.render("createQuestion",pageInfo)
+	})
+
+	app.get("/logout",isLoggedIn,function(req,res){
+		req.logout()
+		res.redirect("/auth")
+	})
+
+	app.get("/viewResult/:cid",isLoggedIn,function(req,res){
+		var pageInfo = {}
+		batch.menuItems((found)=>{
+			pageInfo.menu = found.menu
+		})
+		var searchParam = req.params.cid;
+		score.showScore(searchParam,(found)=>{
+			if(found["res"] == true &&found.data>0){
+				pageInfo.data = found.data
+				pageInfo.currentUserId = req.user._id
+				res.render("showResult",pageInfo)
+			}
+			else if(found.data==0){
+				req.flash('errorMessages','Currently there is no result to show')
+				res.redirect('/contest');
+			}
+			else
+				res.render("error");
+		})
+	})
+
+	app.post("/submit",isLoggedIn,function(req,res){
+		score.calculateScore(req,(found)=>{
+			req.flash('errorMessages','You have successfully submitted the paper')
+			res.redirect('/');
+		})
 	})
 
 	app.post('/contest/addQuestion',isLoggedIn,isAdmin,function(req,res){
-
-	 	let sampleFile = req.files.iq1o1;
- 		question.createQuestion(req,res,(found)=>{
-
+ 		question.createQuestion(req,(found)=>{
+ 			req.flash('errorMessages','Question addedd successfully')
+			res.redirect('/');
  		})
-
- 		/*question.insertImage(req,res,(found)=>{
-
- 		})*/
-	  // Use the mv() method to place the file somewhere on your server 
-	  /*sampleFile.mv(__dirname+'/abc.jpg', function(err) {
-	    if (err)
-	      return res.status(500).send(err);
-	 
-	    res.send('File uploaded!');
-	  });*/
 	})
 
 	app.post('/login', passport.authenticate('local-login', {
@@ -282,30 +271,8 @@ module.exports = function(app,passport){
 
 	app.post('/contest/createContest',isLoggedIn,isAdmin,function(req,res){
 		contest.createContest(req,res,(found)=>{
-
-		})
-		
-	})
-
-	app.get("/logout",isLoggedIn,function(req,res){
-		req.logout()
-		res.redirect("/auth")
-	})
-
-	app.get("/viewResult/:cid",isLoggedIn,function(req,res){
-		var pageInfo = {}
-		batch.menuItems((found)=>{
-			pageInfo.menu = found.menu
-		})
-		score.showScore(req,res,(found)=>{
-			
-			pageInfo.data = found.data
-			pageInfo.currentUserId = req.user._id
-			res.render("showResult",pageInfo)
+			req.flash('errorMessages','Contest created successfully')
+			res.redirect('/');
 		})
 	})
-
-
-
-	
 }

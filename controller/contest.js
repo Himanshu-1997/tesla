@@ -15,14 +15,16 @@ exports.createContest = function(req,res,callback){
 	})
 }
 
-exports.getContest = function(req,res,callback){
+exports.getContest = function(callback){
 	searchParameter = {}
 	searchParameter.isDisabled = false
 	contestModel.find(searchParameter,function(err,data){
-		if(err)
-			throw err
+		if(err){
+			console.log(err)
+			callback({'res':false})
+		}
 		else{
-			callback({'data':data})
+			callback({'data':data,'res':true})
 		}
 	}).sort([['startTime', 'ascending']])
 }

@@ -3,7 +3,7 @@ var async = require('async')
 const questionModel = mongoose.model('Question')
 const contestModel = mongoose.model('Contest')
 const scoreModel = mongoose.model('Score')
-exports.calculateScore = function(req,res,callback){
+exports.calculateScore = function(req,callback){
 	//console.log(req.body)
 	var len = Object.keys(req.body).length
 	var tostr = Object.keys(req.body)
@@ -49,31 +49,35 @@ exports.calculateScore = function(req,res,callback){
 	//}
 }
 
-exports.checkSubmission = function(req,res,callback){
+exports.checkSubmission = function(user,contest,callback){
 	let searchParameter = {}
-	searchParameter.user = req.user._id
-	searchParameter.contest = req.params.cid
+	searchParameter.user = user 
+	searchParameter.contest = contest 
 	//console.log(searchParameter)
 	scoreModel.find(searchParameter,function(err,found){
-		if(err)
-			throw err
+		if(err){
+			console.log(err);
+			console.log({"res":false})
+		}
 		else{
 			//console.log(found.length)
-			callback({"total":found.length})
+			callback({"total":found.length,"res":true})
 		}
 	})
 }
 
-exports.showScore = function(req,res,callback){
-	var cid = req.params.cid
+exports.showScore = function(key,callback){
+	var cid = key
 	searchParameter = {}
 	searchParameter.contest = cid
 	scoreModel.find(searchParameter,(err,data)=>{
 	}).populate("user").populate("contest").exec(function(err,found){
-		if(err)
-			throw err
+		if(err){
+			console.log(err);
+			callback({"res":false})
+		}
 		else
-			callback({'data':found})
+			callback({'data':found,"res":true})
 	})
 
 }
