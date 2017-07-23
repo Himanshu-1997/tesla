@@ -3,8 +3,8 @@ var async = require('async')
 const questionModel = mongoose.model('Question')
 const contestModel = mongoose.model('Contest')
 const scoreModel = mongoose.model('Score')
+
 exports.calculateScore = function(req,callback){
-	//console.log(req.body)
 	var len = Object.keys(req.body).length
 	var tostr = Object.keys(req.body)
 		items = []
@@ -18,10 +18,6 @@ exports.calculateScore = function(req,callback){
 				if(err)
 					throw err
 				else{
-					console.log("------------------------")
-					console.log(data.answer)
-					console.log(req["body"][item])
-					console.log("@@@@@@@@@@@@@@@@@@@@@@@@@")
 					if(data.answer == req["body"][item])
 						score = score + 3
 
@@ -37,30 +33,26 @@ exports.calculateScore = function(req,callback){
 					'submitTime'    : new Date(),
 					
 				}).save(function(err,data){
-					if(err)
-						throw err
+					if(err){
+						console.log(err)
+					}
 					else
 						console.log("inserted")
 				})
 			}
 		)
-
-
-	//}
 }
 
 exports.checkSubmission = function(user,contest,callback){
 	let searchParameter = {}
 	searchParameter.user = user 
 	searchParameter.contest = contest 
-	//console.log(searchParameter)
 	scoreModel.find(searchParameter,function(err,found){
 		if(err){
 			console.log(err);
 			console.log({"res":false})
 		}
 		else{
-			//console.log(found.length)
 			callback({"total":found.length,"res":true})
 		}
 	})

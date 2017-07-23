@@ -18,9 +18,8 @@ exports.createQuestion = function(req,callback){
 		o4 = data["q"+(i+1)+"o4"]
 		m = data["m"+(i+1)]
 		a = data["a"+(i+1)]
-		//console.log("hiii=>"+i)
 		if(q==""||o1==""||o2==""||o3==""||o4==""){
-			//console.log("okkk=>"+i)
+			
 			continue
 		}
 		else{

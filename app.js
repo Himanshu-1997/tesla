@@ -17,6 +17,8 @@ const passport = require('passport');
 const path = require('path');
 const fs = require('fs');
 const fileUpload = require('express-fileupload');
+const log = require('./config/basicconf').log;
+
 
 /* Configuring the sessions cookie and passport authentication */
 var app = express();

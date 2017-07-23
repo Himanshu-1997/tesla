@@ -1,0 +1,39 @@
+{
+  "name": "tesla",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "async": "^2.4.1",
+    "bcrypt-nodejs": "^0.0.3",
+    "body-parser": "^1.17.2",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.3",
+    "asnyc-each": "^1.0.1",
+    "express": "^4.15.3",
+    "express-fileupload": "^0.1.3",
+    "express-session": "^1.15.3",
+    "formidable": "^1.1.1",
+    "ejs": "^2.5.6",
+    "fs": "^0.0.1-security",
+    "mongoose": "^4.10.6",
+    "multer": "^1.3.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lalrishav/tesla.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lalrishav/tesla/issues"
+  },
+  "homepage": "https://github.com/lalrishav/tesla#readme"
+}

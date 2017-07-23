@@ -5,7 +5,7 @@ const score = require('./controller/score.js')
 const formidable = require('formidable');
 const fs = require('fs');
 const async = require('async')
-
+const log = require('./config/basicconf').log;
 
 function isLoggedIn(req,res,next){
 	/*This function chek weather the user is logged in or not */
@@ -36,6 +36,7 @@ module.exports = function(app,passport){
 
 	app.get('/',(req,res)=>{
 		res.redirect("/auth")
+
 	})
 
 	app.get('/dashboard',isLoggedIn,function(req,res){
@@ -50,6 +51,7 @@ module.exports = function(app,passport){
 	})
 
 	app.get('/auth',function(req,res){
+		log("hello.js",req);
 		if(req.isAuthenticated())
 			res.redirect('/dashboard');
 		else
@@ -103,7 +105,6 @@ module.exports = function(app,passport){
 		question.getQuestion(searchParam,(found)=>{
 			if(found.res==true && found.data.length>0){
 				pageInfo.data = found.data
-				console.log(pageInfo)
 				res.render("viewSolution",pageInfo)
 			}
 			else if(found.data.length == 0){
@@ -140,8 +141,6 @@ module.exports = function(app,passport){
 					pageInfo.data = found.data
 					endTime = (found.data)[0].contest.endTime
 					startTime = (found.data)[0].contest.startTime
-					console.log("endTime="+endTime)
-					console.log("startTime="+startTime)
 					if(founds.total != 0){
 						req.flash('errorMessages','You have allready submitted the paper!!!')
 						res.redirect('/contest');
@@ -163,8 +162,6 @@ module.exports = function(app,passport){
 					res.redirect('/contest');
 				}
 				else{
-					console.log("hello")
-
 					res.render("error")
 				}
 			})
@@ -270,9 +267,14 @@ module.exports = function(app,passport){
 
 
 	app.post('/contest/createContest',isLoggedIn,isAdmin,function(req,res){
-		contest.createContest(req,res,(found)=>{
-			req.flash('errorMessages','Contest created successfully')
-			res.redirect('/');
+		contest.createContest(req,(found)=>{
+			if(found.res == true){
+				req.flash('errorMessages','Contest created successfully')
+				res.redirect('/');
+			}
+			else{
+				res.render("error");
+			}
 		})
 	})
 }
