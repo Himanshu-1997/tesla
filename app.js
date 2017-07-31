@@ -18,6 +18,7 @@ const path = require('path');
 const fs = require('fs');
 const fileUpload = require('express-fileupload');
 const log = require('./config/basicconf').log;
+var accesslog = require('access-log');
 
 
 /* Configuring the sessions cookie and passport authentication */

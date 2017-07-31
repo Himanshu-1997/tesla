@@ -5,5 +5,5 @@ exports.log = function(message,req){
 	var ip = req.connection.remoteAddress;
 	var host = req.headers.host;
 	var message = date + " " + ip + " " + host  + " " + message + "\n\n";
-    fs.appendFileSync("access.log", message); 
+    fs.appendFileSync("manual.log", message); 
 }

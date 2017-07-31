@@ -5,7 +5,10 @@ const score = require('./controller/score.js')
 const formidable = require('formidable');
 const fs = require('fs');
 const async = require('async')
+//this is a self created module which will store the logs in the file.
 const log = require('./config/basicconf').log;
+var accesslog = require('access-log');
+
 
 function isLoggedIn(req,res,next){
 	/*This function chek weather the user is logged in or not */
@@ -28,6 +31,16 @@ function isLoggedIn(req,res,next){
 	}
 }
 
+function keepLog(req,res,next){
+	var format = 'url=":url" method=":method" statusCode=":statusCode" delta=":delta" ip=":ip"';
+	accesslog(req, res, format, function(s) {
+		  var date = new Date();
+		  s = date + " " + s + "\n\n";
+		  fs.appendFileSync("access.log", s);
+	});
+	return next();
+}
+
 
 
 module.exports = function(app,passport){
@@ -40,6 +53,7 @@ module.exports = function(app,passport){
 	})
 
 	app.get('/dashboard',isLoggedIn,function(req,res){
+
 		var pageInfo = {};
 		pageInfo.user = req.user;
 		batch.menuItems((found)=>{
@@ -50,8 +64,9 @@ module.exports = function(app,passport){
 		res.render("dashboard",pageInfo)
 	})
 
-	app.get('/auth',function(req,res){
-		log("hello.js",req);
+	app.get('/auth',keepLog,function(req,res){
+		
+		//accesslog(req,res);
 		if(req.isAuthenticated())
 			res.redirect('/dashboard');
 		else
@@ -66,7 +81,7 @@ module.exports = function(app,passport){
 			})
 	})
 
-	app.get('/contest',isLoggedIn,function(req,res){
+	app.get('/contest',keepLog,isLoggedIn,function(req,res){
 		var pageInfo = {}
 		pageInfo.title = "Contests"
 		pageInfo.user = req.user;
@@ -95,7 +110,7 @@ module.exports = function(app,passport){
 		})
 	})
 
-	app.get("/viewSolution/:cid",isLoggedIn,isAdmin,function(req,res){
+	app.get("/viewSolution/:cid",keepLog,isLoggedIn,isAdmin,function(req,res){
 		let pageInfo = {}
 		batch.adminMenu((found)=>{
 			pageInfo.menu = found.adminMenu
@@ -117,7 +132,7 @@ module.exports = function(app,passport){
 		})
 	})
 
-	app.get("/questionPanel/:cid",isLoggedIn,function(req,res){
+	app.get("/questionPanel/:cid",keepLog,isLoggedIn,function(req,res){
 		items = [score]
 		async.each(items,function(item,callback){
 			let userId = req.user._id
@@ -170,7 +185,7 @@ module.exports = function(app,passport){
 
 	
 
-	app.get("/editContest",isLoggedIn,isAdmin,function(req,res){
+	app.get("/editContest",keepLog,isLoggedIn,isAdmin,function(req,res){
 		let pageInfo = {}
 		batch.adminMenu((found)=>{
 			pageInfo.menu = found.adminMenu
@@ -195,7 +210,7 @@ module.exports = function(app,passport){
 		})
 	})
 
-	app.get('/contest/createContest',isLoggedIn,isAdmin,function(req,res){
+	app.get('/contest/createContest',keepLog,isLoggedIn,isAdmin,function(req,res){
 		let pageInfo = {}
 		batch.adminMenu((found)=>{
 			pageInfo.menu = found.adminMenu
@@ -203,7 +218,7 @@ module.exports = function(app,passport){
 		res.render("createContest",pageInfo)
 	})
 
-	app.get('/contest/addQuestion/:cid',isLoggedIn,isAdmin,function(req,res){
+	app.get('/contest/addQuestion/:cid',keepLog,isLoggedIn,isAdmin,function(req,res){
 		var cid = req.params.cid
 		var pageInfo = {}
 		batch.adminMenu((found)=>{
@@ -213,12 +228,12 @@ module.exports = function(app,passport){
 		res.render("createQuestion",pageInfo)
 	})
 
-	app.get("/logout",isLoggedIn,function(req,res){
+	app.get("/logout",keepLog,isLoggedIn,function(req,res){
 		req.logout()
 		res.redirect("/auth")
 	})
 
-	app.get("/viewResult/:cid",isLoggedIn,function(req,res){
+	app.get("/viewResult/:cid",keepLog,isLoggedIn,function(req,res){
 		var pageInfo = {}
 		batch.menuItems((found)=>{
 			pageInfo.menu = found.menu
@@ -239,14 +254,14 @@ module.exports = function(app,passport){
 		})
 	})
 
-	app.post("/submit",isLoggedIn,function(req,res){
+	app.post("/submit",keepLog,isLoggedIn,function(req,res){
 		score.calculateScore(req,(found)=>{
 			req.flash('errorMessages','You have successfully submitted the paper')
 			res.redirect('/');
 		})
 	})
 
-	app.post('/contest/addQuestion',isLoggedIn,isAdmin,function(req,res){
+	app.post('/contest/addQuestion',keepLog,isLoggedIn,isAdmin,function(req,res){
  		question.createQuestion(req,(found)=>{
  			req.flash('errorMessages','Question addedd successfully')
 			res.redirect('/');
@@ -266,7 +281,7 @@ module.exports = function(app,passport){
 	}))
 
 
-	app.post('/contest/createContest',isLoggedIn,isAdmin,function(req,res){
+	app.post('/contest/createContest',keepLog,isLoggedIn,isAdmin,function(req,res){
 		contest.createContest(req,(found)=>{
 			if(found.res == true){
 				req.flash('errorMessages','Contest created successfully')
