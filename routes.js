@@ -64,8 +64,6 @@ module.exports = function(app,passport){
 	})
 
 	app.get('/auth',keepLog,function(req,res){
-		
-		//accesslog(req,res);
 		if(req.isAuthenticated())
 			res.redirect('/dashboard');
 		else
@@ -297,12 +295,9 @@ module.exports = function(app,passport){
 		var qid = req.query.qid;
 		var response = req.query.response;
 		var uid = req.user._id;
-		console.log(cid);
-		console.log(qid);
-		console.log(response);
 		score.insertAttempt(uid,cid,qid,response,(found)=>{
 			if(found["res"] == true){
-				console.log("inserted");
+
 			}
 			else{
 				
