@@ -1,13 +1,29 @@
-New Features
+TESLA
 
-Welcome to the new version of tesla:-
+Tesla is a project which hosts the online competition in institute colleges or any technical fests.
 
-Improvements:-
-1:- Graphics has been changed
-2:- Improvement in api
-3:- Now you are being logged for all you activity hence security increases
-6:- Admins can select the type of contest either it has negative or not and mor diffrent types of contest
-7:-Resume system is available.Assume you lost your connectivity or server failed so now no need to panic all your response will be still recorded to us
-8. Admin panel improved.More than one question can be added at a one time
- CREATED BY LAL RISHAV.
- Language used:- Nodejs and ajax
+Important features:-
+1. It support all format of competition either subjective or objective or both mixed.
+
+2.Proper admin panel to controll the user and insert questions and hold contest
+
+3.Proper log files maintain for each and every activity
+
+New Features:-
+1.Added penalty for more than one attempts.
+2.Admin panel improved.More than one question can be added at a one time
+3.If you request for any page and u r not authenticated then after login you will be redirected to the same page as requested above.
+
+Working on:-
+1.Resume system will be available.Assume you lost your connectivity or server failed so now no need to panic all your response will be still recorded to .
+2.Will try to provide authentication to user using college cyberoam userid password.
+3.More security will be increased and log will me maintain.
+
+Skills used:- Node.js,Ajax,Bootstrap Template and mongoDb
+
+How to setup:-
+1.Install nodejs npm and mongodb from and isntall all the npm packages in package.json file
+2.Change your configuration from ./config/conf file
+3. start the mongodb server mongod
+4. start the node server npm app.js
+5.Now get connected to your configured server.

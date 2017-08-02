@@ -11,6 +11,9 @@ const accesslog = require('access-log');
 
 function isLoggedIn(req,res,next){
 	/*This function chek weather the user is logged in or not */
+	//console.log(req.url);
+	req.session.returnTo = req.url;
+	req.session.method = req.method;
 	if(req.isAuthenticated())
 		return next();
 	else{
@@ -52,7 +55,6 @@ module.exports = function(app,passport){
 	})
 
 	app.get('/dashboard',isLoggedIn,function(req,res){
-
 		var pageInfo = {};
 		pageInfo.user = req.user;
 		batch.menuItems((found)=>{
@@ -265,17 +267,35 @@ module.exports = function(app,passport){
  		})
 	})
 
-	app.post('/login', passport.authenticate('local-login', {
-        successRedirect : '/dashboard', // redirect to the secure profile section
+	/*app.post('/login', passport.authenticate('local-login', {
+        successRedirect : req.session.returnTo, // redirect to the secure profile section
         failureRedirect : '/auth', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
-    }));
+    }));*/
 
-	app.post('/register',passport.authenticate('local-signup',{
+	app.post('/ ',passport.authenticate('local-signup',{
 		successRedirect :  '/dashboard',
 		failureRedirect :  '/auth',
-		failureFlash    :  true
-	}))
+ 	}))
+
+ 	app.post('/login',function(req,res,next){
+ 		var redirectSite = req.session.returnTo;
+ 		var method = req.session.method;
+ 		console.log(redirectSite);
+ 		if((redirectSite == "/login" || redirectSite == "/auth" || redirectSite == "/logout" || redirectSite == undefined ) && (method == "" || method == "GET")){
+ 			console.log("hello")
+ 			redirectSite = "/dashboard";
+ 		}
+ 		console.log(redirectSite);
+ 		//console.log(req.session.returnTo)
+ 		passport.authenticate(
+ 				'local-login',{ 
+ 					successRedirect :  redirectSite,
+ 					failureRedirect : '/auth',
+ 					failureFlash : true
+ 				}
+ 			)(req,res,next);
+ 	})
 
 
 	app.post('/contest/createContest',keepLog,isLoggedIn,isAdmin,function(req,res){
