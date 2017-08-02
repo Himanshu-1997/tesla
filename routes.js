@@ -5,9 +5,8 @@ const score = require('./controller/score.js')
 const formidable = require('formidable');
 const fs = require('fs');
 const async = require('async')
-//this is a self created module which will store the logs in the file.
 const log = require('./config/basicconf').log;
-var accesslog = require('access-log');
+const accesslog = require('access-log');
 
 
 function isLoggedIn(req,res,next){
@@ -136,7 +135,7 @@ module.exports = function(app,passport){
 		items = [score]
 		async.each(items,function(item,callback){
 			let userId = req.user._id
-			let contestId = req.params.cid
+			var contestId = req.params.cid
 			item.checkSubmission(userId,contestId,(found)=>{
 				if(found["res"]==true){
 					calc = found.total
@@ -289,6 +288,24 @@ module.exports = function(app,passport){
 			}
 			else{
 				res.render("error");
+			}
+		})
+	})
+
+	app.get('/enterAttempt',isLoggedIn,function(req,res){
+		var cid = req.query.cid;
+		var qid = req.query.qid;
+		var response = req.query.response;
+		var uid = req.user._id;
+		console.log(cid);
+		console.log(qid);
+		console.log(response);
+		score.insertAttempt(uid,cid,qid,response,(found)=>{
+			if(found["res"] == true){
+				console.log("inserted");
+			}
+			else{
+				
 			}
 		})
 	})

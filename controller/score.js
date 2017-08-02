@@ -3,7 +3,7 @@ var async = require('async')
 const questionModel = mongoose.model('Question')
 const contestModel = mongoose.model('Contest')
 const scoreModel = mongoose.model('Score')
-
+const attemptModel = mongoose.model('Attempt');
 exports.calculateScore = function(req,callback){
 	var len = Object.keys(req.body).length
 	var tostr = Object.keys(req.body)
@@ -72,4 +72,19 @@ exports.showScore = function(key,callback){
 			callback({'data':found,"res":true})
 	})
 
+}
+
+exports.insertAttempt = function(uid,cid,qid,response,callback){
+	let newAttempt = new attemptModel({
+		"user" 				: uid,
+		"contest" 			: cid,
+		"question" 			: qid,
+		"attemptedOption" 	: response
+
+	}).save(function(err){
+		if(err)
+			callback({"res":false})
+		else
+			callback({"res":true})
+	})
 }

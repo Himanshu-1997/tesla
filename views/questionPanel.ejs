@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <script type="text/javascript">
         /*var counter = 0;
         function next(){
@@ -144,10 +145,15 @@
                         <% for(var i=0;i<data.length;i++){%>
                             <div id="q<%=i %>" style="display: none;">
                             <h3 style="color: green">Q<%= i+1 %>.<%= data[i].question %></h3>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="1">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option1 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="2">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option2 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="3">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option3 %></h4><br>
-                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="4">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option4 %></h4><br>
+
+                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="1" onclick="enterAttempt('<%= cid %>','<%= data[i]._id %>','1')">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option1 %></h4><br>
+
+                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="2" onclick="enterAttempt('<%= cid %>','<%= data[i]._id %>','2')">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option2 %></h4><br>
+
+                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="3" onclick="enterAttempt('<%= cid %>','<%= data[i]._id %>','3')">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option3 %></h4><br>
+
+                            <h4 style="color: darkgreen"><input type="radio" name="<%= data[i]._id %>" value="4" onclick="enterAttempt('<%= cid %>','<%= data[i]._id %>','4')">&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].option4 %></h4><br>
+
                             </div>
                         <% } %>
                         <input type="button" id="next" value="next" onclick="next1()">
@@ -171,6 +177,7 @@
 
     <!-- jQuery -->
     <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="../js/use.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
